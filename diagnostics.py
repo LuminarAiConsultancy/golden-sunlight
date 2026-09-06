@@ -14,6 +14,7 @@ else to the screen. Paste the screen output back.
 import hashlib
 import math
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -23,6 +24,10 @@ from solarpos import sun_position
 
 LAT, LON = g.LAT, g.LON
 R = hz.EARTH_R
+
+# Write the CSVs beside this script, not into whatever folder the terminal is
+# sitting in, for the same reason the tile cache is anchored.
+OUT_DIR = Path(__file__).resolve().parent
 
 
 # ---------------------------------------------------------------- 1. provenance
@@ -34,10 +39,10 @@ def provenance():
     print("This is the AWS/Mapzen Terrain Tiles 'skadi' collection, NOT raw SRTM.")
     print()
     total_void = 0
-    for name in sorted(os.listdir("dem")):
+    for name in sorted(os.listdir(hz.DEM_DIR)):
         if not name.endswith(".hgt"):
             continue
-        path = os.path.join("dem", name)
+        path = os.path.join(hz.DEM_DIR, name)
         raw = open(path, "rb").read()
         side = int(round(math.sqrt(len(raw) / 2)))
         arr = np.frombuffer(raw, dtype=">i2").reshape(side, side)
@@ -64,8 +69,10 @@ def observer(grid, lat0, lon0, step):
                            np.array([LAT]), np.array([LON]))[0])
     print(f"  Point: {LAT} N, {LON} E")
     print(f"  DEM elevation at that point (bilinear): {base:.1f} m")
-    print(f"  Observer eye height added:              {1.6:.1f} m")
-    print(f"  Sightline origin used:                  {base + 1.6:.1f} m")
+    print(f"  Observer eye height added:              "
+          f"{hz.OBSERVER_HEIGHT_M:.1f} m")
+    print(f"  Sightline origin used:                  "
+          f"{base + hz.OBSERVER_HEIGHT_M:.1f} m")
     print("  Source: the DEM itself. NOT a surveyed or published elevation.")
 
     # near-field spread, which is where canopy and buildings sit
@@ -168,7 +175,7 @@ def horizon_tables(grid, lat0, lon0, step, base):
     print("=" * 72)
     azs = np.arange(0.0, 360.0, 0.5)
     coarse = horizon_arc(grid, lat0, lon0, step, base, azs)
-    np.savetxt("skyline_full.csv", np.c_[azs, coarse], delimiter=",",
+    np.savetxt(OUT_DIR / "skyline_full.csv", np.c_[azs, coarse], delimiter=",",
                header="bearing_deg,horizon_deg", comments="", fmt="%.4f")
     print(f"  720 rows written. Max {coarse.max():.2f} deg at "
           f"{azs[coarse.argmax()]:.1f} deg.")
@@ -196,7 +203,7 @@ def horizon_tables(grid, lat0, lon0, step, base):
         print(f"    max over-estimate  by coarse: {d.min():+.3f} deg "
               f"at {fine_az[d.argmin()]:.2f}")
         print(f"    RMS difference: {np.sqrt((d**2).mean()):.3f} deg")
-        np.savetxt(f"skyline_fine_{lo_a}_{hi_a}.csv",
+        np.savetxt(OUT_DIR / f"skyline_fine_{lo_a}_{hi_a}.csv",
                    np.c_[fine_az, fine], delimiter=",",
                    header="bearing_deg,horizon_deg", comments="", fmt="%.4f")
 

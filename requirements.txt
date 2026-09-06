@@ -1,0 +1,9 @@
+# The only third-party package this project needs. Everything else it uses
+# (math, datetime, argparse, gzip, os, pathlib, urllib, hashlib) ships with
+# Python itself.
+#
+# Tested on numpy 2.4.4, under Python 3.14.2 on Windows 11.
+# The floor below is set well under that because the code uses only long
+# established numpy features. Nothing older than 2.4.4 has actually been run,
+# so treat 1.24 as "no known reason to fail", not as "verified".
+numpy>=1.24

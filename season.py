@@ -5,12 +5,14 @@ SUMMER (or any month) FROM THE SAVED SKYLINE
 Reads skyline_full.csv, written by diagnostics.py, so it needs no elevation
 tiles and runs in seconds.
 
-    C:\\Python314\\python.exe season.py              # July and August
-    C:\\Python314\\python.exe season.py 5 6 7 8 9    # any months you like
+    python season.py                    # July and August
+    python season.py 5 6 7 8 9          # any months you like
+    python season.py --year 2028 12     # a different year
 """
 
+import argparse
 import datetime as dt
-import sys
+from pathlib import Path
 
 import numpy as np
 
@@ -18,9 +20,25 @@ import goldensun as g
 from solarpos import sun_position
 
 LAT, LON = g.LAT, g.LON
-YEAR = 2027
 
-az_grid, horizon = np.loadtxt("skyline_full.csv", delimiter=",",
+ap = argparse.ArgumentParser(description=__doc__,
+                             formatter_class=argparse.RawDescriptionHelpFormatter)
+ap.add_argument("months", nargs="*", type=int, default=[7, 8],
+                help="month numbers to report (default: 7 8)")
+ap.add_argument("--year", type=int, default=g.ANALYSIS_YEAR,
+                help=f"calendar year (default {g.ANALYSIS_YEAR})")
+args = ap.parse_args()
+YEAR = args.year
+
+# Resolve the skyline file next to this script rather than relative to wherever
+# the terminal happens to be sitting, so the command works from any folder.
+SKYLINE = Path(__file__).resolve().parent / "skyline_full.csv"
+if not SKYLINE.exists():
+    raise SystemExit(
+        f"Cannot find {SKYLINE.name}. Run 'python diagnostics.py' first; it "
+        f"writes that file. Looked in: {SKYLINE.parent}")
+
+az_grid, horizon = np.loadtxt(SKYLINE, delimiter=",",
                               skiprows=1, unpack=True)
 
 
@@ -47,7 +65,7 @@ def hm(h):
     return f"{hr%12 or 12}:{mi:02d} {'am' if hr<12 else 'pm'}"
 
 
-months = [int(a) for a in sys.argv[1:]] or [7, 8]
+months = args.months or [7, 8]
 NAMES = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May",
          6: "June", 7: "July", 8: "August", 9: "September", 10: "October",
          11: "November", 12: "December"}

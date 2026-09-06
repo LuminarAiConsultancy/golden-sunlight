@@ -14,11 +14,18 @@ import gzip
 import math
 import os
 import urllib.request
+from pathlib import Path
 
 import numpy as np
 
+# Where the elevation tiles are cached. Anchored to this file rather than to
+# the working directory, so running the scripts from somewhere else reuses the
+# existing ~104 MB cache instead of downloading a second copy.
+DEM_DIR = Path(__file__).resolve().parent / "dem"
+
 EARTH_R = 6_371_000.0     # mean radius, metres
 REFRACTION_K = 0.13       # standard atmospheric refraction coefficient
+OBSERVER_HEIGHT_M = 1.6   # eye level above ground; the single source of truth
 
 # Public, no-login mirror of 1-arc-second (~30 m) SRTM tiles, gzipped .hgt.
 TILE_URL = "https://s3.amazonaws.com/elevation-tiles-prod/skadi/{ns}/{name}.hgt.gz"
@@ -34,7 +41,7 @@ def tile_name(lat: float, lon: float) -> str:
     return f"{'N' if la >= 0 else 'S'}{abs(la):02d}{'E' if lo >= 0 else 'W'}{abs(lo):03d}"
 
 
-def fetch_tile(name: str, cache_dir: str = "dem") -> str:
+def fetch_tile(name: str, cache_dir=DEM_DIR) -> str:
     """Download one .hgt tile if we do not already have it. Returns the path."""
     os.makedirs(cache_dir, exist_ok=True)
     path = os.path.join(cache_dir, name + ".hgt")
@@ -49,7 +56,7 @@ def fetch_tile(name: str, cache_dir: str = "dem") -> str:
     return path
 
 
-def load_mosaic(lat: float, lon: float, radius_km: float, cache_dir: str = "dem"):
+def load_mosaic(lat: float, lon: float, radius_km: float, cache_dir=DEM_DIR):
     """Stitch together every tile we need to see `radius_km` in all directions.
 
     Returns (grid, lat0, lon0, step) where grid[row, col] is metres above sea
@@ -107,7 +114,7 @@ def sample(grid, lat0, lon0, step, lats, lons):
 # ---------------------------------------------------------------------------
 
 def horizon_profile(grid, lat0, lon0, step, lat, lon,
-                    observer_height=1.6, radius_km=60.0,
+                    observer_height=OBSERVER_HEIGHT_M, radius_km=60.0,
                     az_step=0.5, ray_step_m=40.0):
     """For every compass bearing, find the highest apparent ridge angle.
 
