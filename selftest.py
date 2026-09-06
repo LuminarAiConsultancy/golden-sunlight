@@ -36,7 +36,8 @@ to check it against.
 
 import datetime as dt
 
-from solarpos import sun_position, solar_declination
+import solarpos as sp
+from solarpos import solar_declination
 import goldensun as g
 
 LAT, LON = g.LAT, g.LON
@@ -100,54 +101,14 @@ CIVIL_TOLERANCE_MIN = 4.0
 # Machinery
 # ---------------------------------------------------------------------------
 
-def _altitude(when_utc):
-    return sun_position(when_utc, LAT, LON)[0]
-
-
-def _refine(lo, hi, target):
-    """Bisect between two UTC instants that straddle `target` altitude."""
-    for _ in range(40):
-        mid = lo + (hi - lo) / 2
-        if (_altitude(lo) - target <= 0) == (_altitude(mid) - target <= 0):
-            lo = mid
-        else:
-            hi = mid
-    return lo
-
-
 def crossings(date, tz, target=0.0):
-    """(up, down) local datetimes when altitude crosses `target` on `date`.
-
-    The scan is anchored to the LOCAL day, not to midnight UTC, because a
-    UTC-anchored window straddles two local days and reports evening values
-    where sunrise was intended.
-    """
-    start = dt.datetime.combine(date, dt.time(0, 0)) - dt.timedelta(hours=tz)
-    up = down = None
-    prev = _altitude(start) - target
-    for m in range(1, 24 * 60 + 1):
-        t = start + dt.timedelta(minutes=m)
-        cur = _altitude(t) - target
-        if prev <= 0 < cur and up is None:
-            up = _refine(t - dt.timedelta(minutes=1), t, target)
-        elif prev > 0 >= cur and up is not None and down is None:
-            down = _refine(t - dt.timedelta(minutes=1), t, target)
-        prev = cur
-    to_local = lambda x: x + dt.timedelta(hours=tz) if x else None
-    return to_local(up), to_local(down)
+    """Thin wrapper over solarpos.crossings for this project's location."""
+    return sp.crossings(date, tz, LAT, LON, target)
 
 
 def transit(date, tz):
-    """Local time of greatest solar altitude, by ternary search."""
-    lo = dt.datetime.combine(date, dt.time(0, 0)) - dt.timedelta(hours=tz)
-    hi = lo + dt.timedelta(days=1)
-    for _ in range(60):
-        a, b = lo + (hi - lo) / 3, hi - (hi - lo) / 3
-        if _altitude(a) < _altitude(b):
-            lo = a
-        else:
-            hi = b
-    return lo + dt.timedelta(hours=tz)
+    """Thin wrapper over solarpos.transit for this project's location."""
+    return sp.transit(date, tz, LAT, LON)
 
 
 def _delta_minutes(computed, published, date):

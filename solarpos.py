@@ -134,6 +134,82 @@ def sun_position(when_utc: dt.datetime, lat_deg: float, lon_deg: float):
     return altitude, azimuth
 
 
+# ---------------------------------------------------------------------------
+# Finding the moments the sun crosses a given altitude
+# ---------------------------------------------------------------------------
+# These live here rather than in each caller so there is one implementation of
+# the search, not several that could drift apart.
+
+# Altitude of the sun's CENTRE, as this module reports it (refraction already
+# applied), at the moment its UPPER LIMB touches a flat horizon. One solar
+# semidiameter, about 16 arcminutes. Almanacs mark sunrise at this point;
+# goldensun.py deliberately uses 0.0 instead, the centre crossing, because it
+# is asking when direct light reaches the ground rather than when the disc is
+# first glimpsed.
+UPPER_LIMB_DEG = -0.2665
+
+# Civil twilight. Both this code and the standard almanacs mark it by the
+# centre of the sun, so there is no limb convention to reconcile.
+CIVIL_TWILIGHT_DEG = -6.0
+
+
+def _refine_crossing(lo, hi, lat_deg, lon_deg, target):
+    """Bisect between two UTC instants that straddle `target` altitude."""
+    for _ in range(40):
+        mid = lo + (hi - lo) / 2
+        lo_below = sun_position(lo, lat_deg, lon_deg)[0] - target <= 0
+        mid_below = sun_position(mid, lat_deg, lon_deg)[0] - target <= 0
+        if lo_below == mid_below:
+            lo = mid
+        else:
+            hi = mid
+    return lo
+
+
+def crossings(date, tz_offset, lat_deg, lon_deg, target=0.0):
+    """(up, down) local datetimes when the sun's altitude crosses `target`.
+
+    Returns None for either value if that crossing does not happen on the day.
+
+    The scan is anchored to the LOCAL day rather than to midnight UTC. A
+    UTC-anchored window straddles two local days, and at this longitude the sun
+    is above the horizon at both ends of it in summer, which silently yields
+    evening values where sunrise was intended.
+    """
+    start = dt.datetime.combine(date, dt.time(0, 0)) - dt.timedelta(hours=tz_offset)
+    up = down = None
+    prev = sun_position(start, lat_deg, lon_deg)[0] - target
+    for m in range(1, 24 * 60 + 1):
+        t = start + dt.timedelta(minutes=m)
+        cur = sun_position(t, lat_deg, lon_deg)[0] - target
+        if prev <= 0 < cur and up is None:
+            up = _refine_crossing(t - dt.timedelta(minutes=1), t,
+                                  lat_deg, lon_deg, target)
+        elif prev > 0 >= cur and up is not None and down is None:
+            down = _refine_crossing(t - dt.timedelta(minutes=1), t,
+                                    lat_deg, lon_deg, target)
+        prev = cur
+    shift = dt.timedelta(hours=tz_offset)
+    return (up + shift if up else None, down + shift if down else None)
+
+
+def transit(date, tz_offset, lat_deg, lon_deg):
+    """Local time of greatest solar altitude (solar noon), by ternary search.
+
+    Altitude has a single maximum across a local day, which is what makes a
+    ternary search valid here.
+    """
+    lo = dt.datetime.combine(date, dt.time(0, 0)) - dt.timedelta(hours=tz_offset)
+    hi = lo + dt.timedelta(days=1)
+    for _ in range(60):
+        a, b = lo + (hi - lo) / 3, hi - (hi - lo) / 3
+        if sun_position(a, lat_deg, lon_deg)[0] < sun_position(b, lat_deg, lon_deg)[0]:
+            lo = a
+        else:
+            hi = b
+    return lo + dt.timedelta(hours=tz_offset)
+
+
 def _refraction(alt_deg: float) -> float:
     """Apparent lift of the sun caused by the atmosphere, in degrees."""
     if alt_deg > 85.0:
