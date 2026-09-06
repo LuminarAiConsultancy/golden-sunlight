@@ -74,14 +74,31 @@ WINDOW_END = dt.date(2027, 4, 30)
 # ---------------------------------------------------------------------------
 # School bell times
 # ---------------------------------------------------------------------------
-# Source:    the four schools' own websites, School District 6 Rocky Mountain.
-# Retrieved: 2026-09-06.
+# School District 6 Rocky Mountain. Provenance is stated PER SCHOOL because
+# these are not equally firm, and a single "retrieved" date across all four
+# would overstate three of them.
 #
 #   Golden Secondary      gss.sd6.bc.ca/about-us/bell-schedule
-#                         warning bell 8:40, Period 1 8:45-10:00
+#                         Cited in source sheet section 4 (2026-09-05) AND
+#                         confirmed against the posted schedule 2026-09-06:
+#                         warning bell 8:40, Period 1 8:45-10:00.
+#                         The only row confirmed twice.
+#
 #   Alexander Park        apes.sd6.bc.ca/about-us/bell-schedule
-#   Nicholson Elementary  TODO(Joy): URL not recorded, times supplied directly
-#   Lady Grey Elementary  TODO(Joy): URL not recorded, times supplied directly
+#                         From source sheet section 4, dated 2026-09-05.
+#                         NOT re-verified on 2026-09-06. Carries its original
+#                         confidence and no more.
+#
+#   Nicholson Elementary  Posted schedule read 2026-09-06 (welcoming bell 8:40,
+#                         classes 8:45, same on Fridays).
+#                         TODO(Joy): URL not recorded.
+#
+#   Lady Grey Elementary  Supplied 2026-09-06 as from the school website.
+#                         Not independently checked.
+#                         TODO(Joy): URL not recorded.
+#
+# Nicholson and Lady Grey are single-sourced with no URL on file, which makes
+# them the weakest inputs in this package. Firm them up before citing.
 #
 # These REPLACE the 8:20 and 8:30 figures used previously, which were inferred
 # from bell times rather than sourced.

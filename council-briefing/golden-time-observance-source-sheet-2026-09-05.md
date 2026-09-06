@@ -3,6 +3,101 @@
 
 ---
 
+> ## REVISION NOTE, added 2026-09-06
+>
+> **The figures in sections 2 and 3 below have been recomputed and some have
+> changed. The original numbers are left in place, unedited, so the change is
+> visible rather than silent. Where this note and the sections below disagree,
+> this note is correct.**
+>
+> This document has not been circulated outside its author. The note exists to
+> keep the working record honest, not to reconcile a version already in
+> somebody else's hands.
+>
+> ### What was recomputed, and why
+>
+> Sections 2 and 3 were originally produced with the Python `astral` library,
+> using a script that was never part of the published code. That meant the
+> single most quoted figure in this package, the 87 mornings, could not be
+> reproduced by anyone checking the work. `civildawn.py` in this repository now
+> recomputes those figures from the same solar code as everything else, with no
+> extra dependency. **`civildawn.py` is authoritative from this date.**
+>
+> This was a recomputation, not a correction of a known error. Nothing was
+> adjusted to reproduce or to avoid the original numbers.
+>
+> ### Section 2, civil dawn and sunrise
+>
+> All nine **civil dawn** times reproduce exactly. **Sunrise** is one minute
+> later on seven of the nine rows (15 Nov, 1 Dec, 15 Dec, 21 Dec, 5 Jan,
+> 1 Feb, 1 Mar); 2 Nov and 15 Jan are unchanged.
+>
+> Section 2 states the coordinates as 51.2967 N, 116.9631 W. The recomputation
+> uses the project's coordinates, 51.2969 N, 116.9647 W, so that the repository
+> has one location rather than two. The two points are about 115 m apart, which
+> is under half a second of time and is **not** the cause of any change below.
+>
+> ### Section 3, the headline counts
+>
+> | Measure | As first drafted | Recomputed |
+> |---|---|---|
+> | Dark at 8:30, BC Pacific | 0 | **0** |
+> | Dark at 8:30, permanent MDT | 87 (Nov 17 to Feb 12) | **89** (Nov 17 to Feb 13) |
+> | Dark at 8:20, BC Pacific | 0 | **0** |
+> | Dark at 8:20, permanent MDT | 98 (Nov 11 to Feb 17) | **101** (Nov 10 to Feb 18) |
+> | Sunrise after 8:45, BC Pacific | 31 | **35** |
+> | Sunrise after 8:45, permanent MDT | 110 | **113** |
+>
+> The counts moved because sub-minute differences flip days that sit near the
+> threshold. The most likely cause is that `astral` uses a geometric 6 degrees
+> for civil dawn while this code applies atmospheric refraction first. Every
+> count moved in the same direction, upward, by two to four days.
+>
+> **The zeros under BC Pacific are unchanged.** The central claim of section 3
+> survives the recomputation.
+>
+> ### Two figures that answer different questions
+>
+> Section 4 previously recorded Lady Grey and Nicholson bell times as "needs
+> checking". Both are now filled in. The provenance differs per school and is
+> stated per row rather than under one date, because they are not equally firm:
+>
+> | School | Bell | Classes | Provenance |
+> |---|---|---|---|
+> | Nicholson Elementary | 8:40 | 8:45 | Posted schedule, read 2026-09-06. URL not recorded. **TODO: record the URL.** |
+> | Golden Secondary | 8:40 | 8:45 | `gss.sd6.bc.ca/about-us/bell-schedule` per section 4 below, and independently confirmed against the posted schedule on 2026-09-06 |
+> | Alexander Park | 8:50 | 8:55 | `apes.sd6.bc.ca/about-us/bell-schedule` per section 4 below, dated 2026-09-05. **Not re-verified on 2026-09-06.** |
+> | Lady Grey Elementary | 8:53 | 8:58 | Supplied 2026-09-06, described as from the school website. URL not recorded and not independently checked. **TODO: record the URL.** |
+>
+> Only Golden Secondary has been confirmed twice. Alexander Park carries its
+> original 2026-09-05 confidence and no more. Nicholson and Lady Grey are
+> single-sourced with no URL on file, which is weaker than every other figure
+> in this package and should be firmed up before any of it is cited.
+>
+> Anchoring the count to those actual bells gives, under permanent MDT, **77**
+> mornings still dark at the earliest bell of 8:40, falling to 49 at the latest
+> classes start of 8:58. Under BC Pacific it is **0 at every bell**.
+>
+> **77 is not a corrected 87.** The two answer different questions. A bell is an
+> ARRIVAL time, so a bell-anchored count measures whether it was dark when the
+> child got there, and necessarily understates the walk that preceded it. The
+> 8:20 and 8:30 figures were an attempt to represent the walk itself. Both are
+> legitimate; presenting either as a revision of the other is not.
+>
+> ### The assumption that actually carries the weight
+>
+> The walking time remains unmeasured, and it matters more than any change
+> above. Under BC Pacific the count is 0 from 8:15 onward, but **20** at 8:10
+> and **46** at 8:00, against 112 and 123 under permanent MDT. The difference
+> between the two options stays large at every hour tested, so the argument
+> holds in every version. The specific claim "not one morning all winter" holds
+> only for departures at 8:15 or later. Section 11 item 2, the walk-versus-bus
+> numbers, is still the gap that would move these figures most.
+>
+> Run `python civildawn.py` to regenerate all of the above.
+
+---
+
 ## 1. The two options, stated as clock offsets
 
 | Option | UTC offset | Same clock as |
