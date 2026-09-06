@@ -1,8 +1,12 @@
 # Golden BC time observance: sunlight, terrain and the clock
 
-Golden sits on the floor of the Columbia Valley with the Purcells on one side and the Rockies on the other. Published sunrise and sunset tables assume a flat horizon, so they describe a place Golden is not. This project calculates two things the almanac cannot: when direct sunlight actually clears the mountain ridge and reaches the townsite, and when there is enough light outdoors to be seen. It does both under the two clock options in front of council, permanent Mountain Standard at UTC minus 7 and permanent Mountain Daylight at UTC minus 6.
+Every published sunrise table, almanac and news figure in this debate assumes a flat, unobstructed horizon. Golden does not have one. The town sits on the floor of the Columbia Valley with the Purcells on one side and the Rockies on the other, and on the winter solstice direct sun does not reach the townsite until 45 minutes after the published almanac says the sun has risen. Decisions taken on published times are being taken on numbers that do not describe this place. This repository measures the difference and lets anyone reproduce it.
 
-The central result is that the clock does not change how much sunlight Golden gets. It changes which end of the day that sunlight lands on. On the winter solstice the town receives 5 hours and 52 minutes of direct sun under either option. The almanac promises 7 hours and 47 minutes; the mountains take the difference, 42 minutes off the morning and 73 minutes off the afternoon. What the clock decides is whether that window opens at 9:35 in the morning or at 10:35.
+## What it does and what it found
+
+The project calculates two things the almanac cannot: when direct sunlight actually clears the mountain ridge and reaches the townsite, and when there is enough light outdoors to be seen. It does both under the two clock options in front of council, permanent Mountain Standard at UTC minus 7 and permanent Mountain Daylight at UTC minus 6.
+
+The central result is that the clock does not change how much sunlight Golden gets. It changes which end of the day that sunlight lands on. On the winter solstice the town receives 5 hours and 52 minutes of direct sun under either option. A flat horizon would give 7 hours and 47 minutes; the mountains take the difference, 42 minutes off the morning and 73 minutes off the afternoon. What the clock decides is whether that window opens at 9:35 in the morning or at 10:35. (Comparisons here use this project's own flat-horizon run, 8:53. A published almanac gives 8:50 for the same morning, three minutes earlier for a documented reason set out under Method and assumptions.)
 
 Across the year 2027, counting days when the sun has not cleared the ridge by a given time:
 
@@ -75,7 +79,22 @@ A reader who takes a `goldensun.py` time as a statement about darkness, or a `ci
 
 **Terrain.** For each of 720 compass bearings, half a degree apart, the code steps outward in 40 metre increments to 60 kilometres, reads the ground elevation, subtracts the amount that point falls below a straight sightline because the Earth curves and the atmosphere bends light, and takes the maximum apparent angle along the ray. Elevation comes from the AWS Terrain Tiles collection at 1 arc-second resolution. Observer eye height is 1.6 metres, at `horizon.py:28`. The refraction coefficient is the standard 0.13, at `horizon.py:27`.
 
-**Why two sunrise conventions.** `goldensun.py` marks the sun as present when its centre clears the skyline. Almanacs mark sunrise when the upper edge of the disc appears. The centre is the better test for direct light reaching the ground, which is what that script is about, so it uses the centre deliberately and accepts a 1 to 2 minute difference from published tables. `civildawn.py` uses the almanac's upper-limb convention instead, because its figures are meant to be checked against published sunrise tables, and a comparison is only meaningful if both sides define the event the same way. The constant is `solarpos.UPPER_LIMB_DEG`.
+**Why two sunrise conventions.** `goldensun.py` marks the sun as present when its centre clears the skyline. Almanacs mark sunrise when the upper edge of the disc appears, which happens earlier because the edge reaches the horizon before the middle does. The centre is the better test for direct light reaching the ground, which is what that script is about, so it uses the centre deliberately and accepts a difference of 1 to 2 minutes from published tables. `civildawn.py` uses the almanac's upper-limb convention instead, because its figures are meant to be checked against published sunrise tables, and a comparison is only meaningful if both sides define the event the same way. The constant is `solarpos.UPPER_LIMB_DEG`.
+
+This is also why two baselines for the winter solstice appear in discussions of this work and both are correct. Against this project's own flat-horizon run, which marks the centre and gives 8:53, the terrain delay is 42 minutes. Against a published almanac time of 8:50, which marks the upper limb, it is 45. The three-minute gap is the convention and nothing else. The rule this README follows is that it uses **42 where it holds the method constant and isolates the terrain**, which is the comparison that measures the thing being measured, and **45 where it compares against a published table**, which is the comparison that matters to somebody holding an almanac. Every occurrence of either figure names the baseline it is against, and any figure quoted from this work elsewhere should do the same.
+
+**School bell times, and where they came from.** `civildawn.py` counts mornings against the four schools' actual bells rather than an assumed walking time. Each was read from the school's own bell-schedule page on 6 September 2026, and none is inferred from the pattern at the others.
+
+| School | Bell | Classes begin | Source page | Year stated on page |
+|---|---|---|---|---|
+| Nicholson Elementary | 8:40 | 8:45 | `nes.sd6.bc.ca/about-us/bell-schedule` | not stated |
+| Golden Secondary | 8:40 | 8:45 | `gss.sd6.bc.ca/about-us/bell-schedule` | 2026-27 |
+| Alexander Park | 8:50 | 8:55 | `apes.sd6.bc.ca/about-us/bell-schedule` | 2025-26 |
+| Lady Grey Elementary | 8:53 | 8:58 | `lges.sd6.bc.ca/about-us/bell-schedule` | 2025-26 |
+
+Two of those four pages are headed 2025-26, the previous school year, and one states no year at all. Only Golden Secondary is on record as current. Morning bells rarely move between years, but that is an assumption rather than a check, and it is recorded here rather than buried. The mitigating fact is that the binding case, the earliest bell at 8:40, is also the best-sourced of the four.
+
+A bell is an arrival time, so a count anchored to it measures whether it was dark when a child got to school, not whether it was dark while they walked. `civildawn.py` reports both, and the departure-time figures span a range because nobody has measured when children actually leave.
 
 **Changing the inputs.**
 
