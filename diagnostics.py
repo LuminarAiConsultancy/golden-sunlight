@@ -89,7 +89,11 @@ def observer(grid, lat0, lon0, step):
     print("  A large near-field spread suggests canopy or structures in the")
     print("  surface model at or beside the observer, which raises the origin")
     print("  and makes ridges look LOWER than they are.")
-    return base
+    # Return the SIGHTLINE ORIGIN, not the bare ground elevation. horizon.py
+    # adds the eye height inside horizon_profile; this module passes the value
+    # straight into horizon_arc, so it has to add it here or the two would be
+    # computing from observers 1.6 m apart.
+    return base + hz.OBSERVER_HEIGHT_M
 
 
 # ------------------------------------------- 3. sampling geometry: flat vs geodesic
