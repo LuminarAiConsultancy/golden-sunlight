@@ -79,26 +79,31 @@ WINDOW_END = dt.date(2027, 4, 30)
 # would overstate three of them.
 #
 #   Golden Secondary      gss.sd6.bc.ca/about-us/bell-schedule
-#                         Cited in source sheet section 4 (2026-09-05) AND
-#                         confirmed against the posted schedule 2026-09-06:
-#                         warning bell 8:40, Period 1 8:45-10:00.
-#                         The only row confirmed twice.
+#                         Warning bell 8:40, Period 1 8:45-10:00.
+#                         Source sheet section 4 (2026-09-05), annotated there
+#                         as the 2026-27 schedule, and confirmed against the
+#                         posted schedule again on 2026-09-06.
+#
+#   Nicholson Elementary  nes.sd6.bc.ca/about-us/bell-schedule
+#                         Welcoming bell 8:40, classes 8:45. Friday morning is
+#                         identical; only dismissal differs (12:06).
+#                         Page read 2026-09-06. School year not stated on the
+#                         page content retrieved.
 #
 #   Alexander Park        apes.sd6.bc.ca/about-us/bell-schedule
-#                         From source sheet section 4, dated 2026-09-05.
-#                         NOT re-verified on 2026-09-06. Carries its original
-#                         confidence and no more.
+#                         Warning bell 8:50, classes 8:55.
+#                         Page read 2026-09-06. PAGE IS HEADED 2025-26.
 #
-#   Nicholson Elementary  Posted schedule read 2026-09-06 (welcoming bell 8:40,
-#                         classes 8:45, same on Fridays).
-#                         TODO(Joy): URL not recorded.
+#   Lady Grey Elementary  lges.sd6.bc.ca/about-us/bell-schedule
+#                         Welcoming bell 8:53, classes 8:58.
+#                         Page read 2026-09-06. PAGE IS HEADED 2025-26.
 #
-#   Lady Grey Elementary  Supplied 2026-09-06 as from the school website.
-#                         Not independently checked.
-#                         TODO(Joy): URL not recorded.
-#
-# Nicholson and Lady Grey are single-sourced with no URL on file, which makes
-# them the weakest inputs in this package. Firm them up before citing.
+# CAVEAT worth stating before any of this is cited: only Golden Secondary is
+# on record as the CURRENT 2026-27 schedule. Alexander Park and Lady Grey both
+# publish a page headed 2025-26, and Nicholson's page did not state a year.
+# Morning bells rarely move between years, but "rarely" is not the standard the
+# rest of this package is held to. The earliest bell, 8:40, is the binding case
+# and it is the best-sourced of the four, which limits the exposure.
 #
 # These REPLACE the 8:20 and 8:30 figures used previously, which were inferred
 # from bell times rather than sourced.

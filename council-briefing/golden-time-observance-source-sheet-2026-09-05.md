@@ -62,17 +62,26 @@
 > checking". Both are now filled in. The provenance differs per school and is
 > stated per row rather than under one date, because they are not equally firm:
 >
-> | School | Bell | Classes | Provenance |
-> |---|---|---|---|
-> | Nicholson Elementary | 8:40 | 8:45 | Posted schedule, read 2026-09-06. URL not recorded. **TODO: record the URL.** |
-> | Golden Secondary | 8:40 | 8:45 | `gss.sd6.bc.ca/about-us/bell-schedule` per section 4 below, and independently confirmed against the posted schedule on 2026-09-06 |
-> | Alexander Park | 8:50 | 8:55 | `apes.sd6.bc.ca/about-us/bell-schedule` per section 4 below, dated 2026-09-05. **Not re-verified on 2026-09-06.** |
-> | Lady Grey Elementary | 8:53 | 8:58 | Supplied 2026-09-06, described as from the school website. URL not recorded and not independently checked. **TODO: record the URL.** |
+> Every time below was read from the school's own bell-schedule page on
+> 2026-09-06. None is inferred from the pattern at the other schools.
 >
-> Only Golden Secondary has been confirmed twice. Alexander Park carries its
-> original 2026-09-05 confidence and no more. Nicholson and Lady Grey are
-> single-sourced with no URL on file, which is weaker than every other figure
-> in this package and should be firmed up before any of it is cited.
+> | School | Bell | Classes | Source page | Year stated on page |
+> |---|---|---|---|---|
+> | Nicholson Elementary | 8:40 | 8:45 | `nes.sd6.bc.ca/about-us/bell-schedule` | not stated |
+> | Golden Secondary | 8:40 | 8:45 | `gss.sd6.bc.ca/about-us/bell-schedule` | 2026-27 |
+> | Alexander Park | 8:50 | 8:55 | `apes.sd6.bc.ca/about-us/bell-schedule` | **2025-26** |
+> | Lady Grey Elementary | 8:53 | 8:58 | `lges.sd6.bc.ca/about-us/bell-schedule` | **2025-26** |
+>
+> Alexander Park's page reads "Warning Bell (inside and outside) 8:50 am" and
+> "Morning Classes Begin (no bell) 8:55 am". Nicholson's Friday morning is
+> identical to the rest of the week; only dismissal differs.
+>
+> **Caveat before citing any of this.** Only Golden Secondary is on record as
+> the current 2026-27 schedule. Alexander Park and Lady Grey both publish a page
+> headed 2025-26, and Nicholson's page does not state a year. Morning bells
+> rarely move between years, but "rarely" is not the standard the rest of this
+> package is held to. The mitigating fact is that the binding case, the earliest
+> bell at 8:40, is also the best-sourced of the four.
 >
 > Anchoring the count to those actual bells gives, under permanent MDT, **77**
 > mornings still dark at the earliest bell of 8:40, falling to 49 at the latest
