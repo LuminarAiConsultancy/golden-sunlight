@@ -21,8 +21,16 @@ walking to school.
 
 Terrain is deliberately EXCLUDED here. Ridges block direct sun but they do not
 stop the sky from lighting up, and civil dawn is about scattered light from the
-whole sky rather than a beam from the sun. Including terrain would understate
-available light.
+whole sky rather than a beam from the sun.
+
+BUT THE FLAT HORIZON IS STILL A LIMITATION, and it errs in a known direction.
+At civil dawn the twilight glow sits low in the EASTERN sky, which is the exact
+band the eastern ridge occludes. So usable light on the ground in Golden arrives
+LATER than these figures show. The direction is certain; the magnitude is not
+computed here and would need a sky-radiance model rather than a ray trace.
+Treat these counts as CONSERVATIVE: real exposure is at least this bad and
+probably worse, under both clock options. The error runs the same way for both,
+so the comparison between them stands.
 
 WHY THIS FILE EXISTS
 --------------------
