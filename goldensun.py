@@ -164,7 +164,12 @@ def main():
               f"{clock(r6):>8} {clock(s6):>8} {h6:7.2f}")
 
     if args.flat:
-        return
+        # The table above is only meaningful if somebody compares it against
+        # published values. Rather than leave that to the reader, run the
+        # checks and say PASS or FAIL outright.
+        print()
+        import selftest
+        return 0 if selftest.run_all(args.year) else 1
 
     # How many days a year does the sun reach the town after 8, 9 and 10am?
     print(f"\nDays in {args.year} the sun clears the ridge after a given clock time:")
@@ -183,4 +188,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
