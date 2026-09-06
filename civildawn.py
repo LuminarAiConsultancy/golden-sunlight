@@ -71,14 +71,39 @@ CIVIL_ALTITUDE = sp.CIVIL_TWILIGHT_DEG
 WINDOW_START = dt.date(2026, 10, 1)
 WINDOW_END = dt.date(2027, 4, 30)
 
-# Clock times the counts are measured against.
+# ---------------------------------------------------------------------------
+# School bell times
+# ---------------------------------------------------------------------------
+# Source:    the four schools' own websites, School District 6 Rocky Mountain.
+# Retrieved: 2026-09-06.
 #
-# TODO(Joy): these are inferred from the bell times in source sheet section 4,
-# which records Golden Secondary at 8:45 and Alexander Park at 8:55, and notes
-# that Lady Grey and Nicholson were "not retrieved". The 8:20 and 8:30 walking
-# times are an INFERENCE from those bells, not a measured figure. Confirm the
-# two missing bell schedules and replace these with something sourced.
-DARK_THRESHOLDS = (dt.time(8, 20), dt.time(8, 30))
+#   Golden Secondary      gss.sd6.bc.ca/about-us/bell-schedule
+#                         warning bell 8:40, Period 1 8:45-10:00
+#   Alexander Park        apes.sd6.bc.ca/about-us/bell-schedule
+#   Nicholson Elementary  TODO(Joy): URL not recorded, times supplied directly
+#   Lady Grey Elementary  TODO(Joy): URL not recorded, times supplied directly
+#
+# These REPLACE the 8:20 and 8:30 figures used previously, which were inferred
+# from bell times rather than sourced.
+#
+# IMPORTANT, and the reason these are not simply "the answer": a bell is an
+# ARRIVAL time. Children are on the road BEFORE it, so a count anchored to a
+# bell answers "was it dark when they arrived", not "was it dark while they
+# walked", and therefore UNDERSTATES exposure. The sweep spans earlier times so
+# the walking period stays visible. The two are different questions and this
+# script reports them separately rather than merging them into one figure.
+BELL_TIMES = [
+    # school                  warning/welcoming  classes begin
+    ("Nicholson Elementary",  dt.time(8, 40),    dt.time(8, 45)),
+    ("Golden Secondary",      dt.time(8, 40),    dt.time(8, 45)),
+    ("Alexander Park",        dt.time(8, 50),    dt.time(8, 55)),
+    ("Lady Grey Elementary",  dt.time(8, 53),    dt.time(8, 58)),
+]
+
+# Reference lines in the sweep standing for students walking to reach the
+# earliest 8:40 bell. INFERRED, not sourced, and labelled as such in output.
+INFERRED_WALKING = (dt.time(8, 15), dt.time(8, 25))
+
 SUNRISE_THRESHOLD = dt.time(8, 45)
 
 # Because the walking window is inferred rather than measured, the headline
@@ -86,7 +111,7 @@ SUNRISE_THRESHOLD = dt.time(8, 45)
 # the sweep below reports the count at every five minutes across the plausible
 # range, so a reader can see how fast the answer moves with the assumption.
 SWEEP_START = dt.time(8, 0)
-SWEEP_END = dt.time(8, 45)
+SWEEP_END = dt.time(8, 55)
 SWEEP_STEP_MIN = 5
 
 # Reference rows from the US Naval Observatory, same query as selftest.py.
@@ -197,7 +222,9 @@ def counts():
     print(f"COUNTS, {WINDOW_START.isoformat()} to {WINDOW_END.isoformat()}")
     print("=" * 74)
 
-    dark = {t: {PACIFIC: [], PERMANENT_MDT: []} for t in DARK_THRESHOLDS}
+    thresholds = sorted({b for _, b, _ in BELL_TIMES}
+                        | {c for _, _, c in BELL_TIMES})
+    dark = {t: {PACIFIC: [], PERMANENT_MDT: []} for t in thresholds}
     late_sunrise = {PACIFIC: [], PERMANENT_MDT: []}
     hour = dt.timedelta(hours=1)
 
@@ -207,7 +234,7 @@ def counts():
         # computing both by verify_clock_offset above.
         dawn, rise = dawn_and_sunrise(day, PACIFIC)
         for tz, shift in ((PACIFIC, dt.timedelta(0)), (PERMANENT_MDT, hour)):
-            for threshold in DARK_THRESHOLDS:
+            for threshold in thresholds:
                 if dawn is not None and (dawn + shift).time() > threshold:
                     dark[threshold][tz].append(day)
             if rise is not None and (rise + shift).time() > SUNRISE_THRESHOLD:
@@ -215,20 +242,23 @@ def counts():
         day += dt.timedelta(days=1)
 
     total = (WINDOW_END - WINDOW_START).days + 1
-    print(f"  {total} days in the window.\n")
+    print(f"  {total} days in the window.")
+    print("  A bell is an ARRIVAL time. These count mornings still fully dark")
+    print("  AT the bell, so they understate the walk that precedes it.\n")
 
     def span(days):
         if not days:
             return ""
-        return f"   ({days[0].strftime('%b %d')} to {days[-1].strftime('%b %d')})"
+        return f"  ({days[0].strftime('%b %d')} to {days[-1].strftime('%b %d')})"
 
-    for threshold in DARK_THRESHOLDS:
-        label = threshold.strftime("%H:%M")
-        p = dark[threshold][PACIFIC]
-        m = dark[threshold][PERMANENT_MDT]
-        print(f"  Days still fully dark (before civil dawn) at {label}")
-        print(f"      BC Pacific      {len(p):3d}{span(p)}")
-        print(f"      Permanent MDT   {len(m):3d}{span(m)}")
+    print(f"  {'school':<22} {'bell':>6} {'Pacific':>8} {'perm MDT':>9}")
+    print("  " + "-" * 62)
+    for school, warning, classes in BELL_TIMES:
+        for label, t in ((f"{school}", warning), ("    classes begin", classes)):
+            p, m = dark[t][PACIFIC], dark[t][PERMANENT_MDT]
+            print(f"  {label:<22} {t.strftime('%H:%M'):>6} {len(p):>8} "
+                  f"{len(m):>9}{span(m)}")
+    print()
     label = SUNRISE_THRESHOLD.strftime("%H:%M")
     p, m = late_sunrise[PACIFIC], late_sunrise[PERMANENT_MDT]
     print(f"  Days sunrise falls after {label}")
@@ -244,8 +274,10 @@ def threshold_sweep():
     print("=" * 74)
     print("  Days still fully dark (before civil dawn) at each clock time,")
     print(f"  {WINDOW_START.isoformat()} to {WINDOW_END.isoformat()}.")
-    print("  The walking window is INFERRED from bell times, not measured, so")
-    print("  the whole range is shown rather than one chosen value.\n")
+    print("  Bell times are sourced. WALKING times are not: nobody has measured")
+    print("  when Golden children actually leave home, so the whole range is")
+    print("  shown rather than one chosen value. The bell rows answer 'dark on")
+    print("  arrival'; the earlier rows answer 'dark while walking'.\n")
     print(f"  {'time':>7} | {'BC Pacific':>12} | {'Permanent MDT':>14} | "
           f"{'difference':>11}")
     print("  " + "-" * 54)
@@ -259,16 +291,32 @@ def threshold_sweep():
             dawns.append(dawn)
         day += dt.timedelta(days=1)
 
+    # Label rows that correspond to something real, so a reader can tell a
+    # sourced bell from a round number on the grid.
+    notes = {}
+    short = {"Nicholson Elementary": "Nicholson", "Golden Secondary": "GSS",
+             "Alexander Park": "Alexander Park", "Lady Grey Elementary": "Lady Grey"}
+    for school, warning, classes in BELL_TIMES:
+        notes.setdefault(warning, []).append(short[school] + " bell")
+        notes.setdefault(classes, []).append(short[school] + " classes")
+    for t in INFERRED_WALKING:
+        notes.setdefault(t, []).append("inferred walking time")
+
     hour = dt.timedelta(hours=1)
-    minutes = SWEEP_START.hour * 60 + SWEEP_START.minute
-    last = SWEEP_END.hour * 60 + SWEEP_END.minute
-    while minutes <= last:
+    grid = set(range(SWEEP_START.hour * 60 + SWEEP_START.minute,
+                     SWEEP_END.hour * 60 + SWEEP_END.minute + 1,
+                     SWEEP_STEP_MIN))
+    grid |= {t.hour * 60 + t.minute for t in notes}
+
+    for minutes in sorted(grid):
         threshold = dt.time(minutes // 60, minutes % 60)
         p = sum(1 for d in dawns if d.time() > threshold)
         m = sum(1 for d in dawns if (d + hour).time() > threshold)
+        note = ", ".join(notes.get(threshold, []))
         print(f"  {threshold.strftime('%H:%M'):>7} | {p:>12} | {m:>14} | "
-              f"{m - p:>11}")
-        minutes += SWEEP_STEP_MIN
+              f"{m - p:>11}   {note}")
+    print()
+    print("  Rows without a note are grid points, not sourced times.")
     print()
 
 
