@@ -98,12 +98,20 @@ def seasonal_dates(year):
     ]
 
 
-def sun_events(date, tz_offset, azimuths, angles, step_minutes=1):
-    """First and last local clock time the sun is above the real skyline."""
+def sun_events(date, tz_offset, azimuths, angles, step_minutes=1,
+               lat=None, lon=None):
+    """First and last local clock time the sun is above the real skyline.
+
+    lat and lon default to the townsite, so existing callers are unaffected.
+    They are parameters so the same machinery can be pointed at another place
+    without a second copy of this loop existing somewhere.
+    """
+    lat = LAT if lat is None else lat
+    lon = LON if lon is None else lon
     visible = []
     t = dt.datetime.combine(date, dt.time(0, 0)) - dt.timedelta(hours=tz_offset)
     for _ in range(24 * 60 // step_minutes):
-        alt, az = sun_position(t, LAT, LON)
+        alt, az = sun_position(t, lat, lon)
         if alt > hz.angle_at(azimuths, angles, az):
             visible.append(t + dt.timedelta(hours=tz_offset))
         t += dt.timedelta(minutes=step_minutes)
