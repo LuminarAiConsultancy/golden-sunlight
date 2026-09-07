@@ -25,7 +25,7 @@ Requires Python 3 and numpy. From the repository folder:
 1. `pip install -r requirements.txt`
 2. `python goldensun.py --flat`
 
-The second command takes under a second, downloads nothing, and prints a set of PASS or FAIL lines checking the solar calculations against published values from the US Naval Observatory. Run it before anything else. If it fails, nothing downstream is worth reading.
+The second command takes under a second and downloads nothing. It prints a flat-horizon time table first, then, about thirteen lines down, a set of PASS or FAIL lines checking the solar calculations against published values from the US Naval Observatory. Read past the table to the PASS block. Run this before anything else. If it fails, nothing downstream is worth reading. python selftest.py prints the same checks without the table.
 
 3. `python goldensun.py`
 
@@ -173,14 +173,14 @@ For a machine with nothing installed.
 
 1. In PowerShell, move to where you want the folder to live, for example `cd $HOME\Documents`
 2. `git clone <repository URL>`
-3. `cd timechange`
+3. `cd golden-sunlight`
 
 **Get the code, without git.**
 
 1. On the repository page in your browser, click the green Code button.
 2. Choose Download ZIP.
 3. Open the downloaded file, and drag the folder inside it to somewhere permanent such as Documents.
-4. In PowerShell, `cd` to that folder, for example `cd $HOME\Documents\timechange`
+4. In PowerShell, `cd` to that folder. The ZIP extracts to a folder named after the repository and branch, usually `golden-sunlight-main`, so the command will look like `cd $HOME\Documents\golden-sunlight-main`. Use whatever name the extracted folder actually has.
 
 **Install the dependency and run.** All of the following are typed into PowerShell.
 
